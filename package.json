@@ -1,0 +1,38 @@
+{
+  "name": "@taskany/release",
+  "version": "1.0.0",
+  "description": "Taskany release CLI",
+  "main": "index.js",
+  "bin": {
+    "taskany-release": "bin/release"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taskany-inc/release.git"
+  },
+  "keywords": [
+    "cli",
+    "release",
+    "ci"
+  ],
+  "files": [
+    "index.js",
+    "bin",
+    "README.md"
+  ],
+  "author": "Taskany Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/taskany-inc/release/issues"
+  },
+  "homepage": "https://github.com/taskany-inc/release#readme",
+  "dependencies": {
+    "conventional-changelog": "3.1.25",
+    "conventional-changelog-conventionalcommits": "5.0.0",
+    "conventional-recommended-bump": "6.1.0",
+    "semver": "7.5.1"
+  }
+}

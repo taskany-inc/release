@@ -1,2 +1,3 @@
-# release
+# Taskany Release
+
 Release CLI
