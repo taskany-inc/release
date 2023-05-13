@@ -3,9 +3,7 @@
   "version": "1.0.1",
   "description": "Taskany release CLI",
   "main": "index.js",
-  "bin": {
-    "@taskany/release": "bin/release"
-  },
+  "bin": "bin/release",
   "scripts": {
     "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
