@@ -1,0 +1,20 @@
+on:
+  workflow_call:
+
+jobs:
+  gh_release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release Tag
+        run: |
+          git config --global user.email "sheep@taskany.org"
+          git config --global user.name "Taskany Sheep"
+          git tag v$(cat version)
+          git push --no-verify origin --tags
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v$(cat version) --title "Release $(cat version)" -F .release_notes/$(cat version).md
