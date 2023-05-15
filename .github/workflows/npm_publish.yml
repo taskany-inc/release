@@ -1,9 +1,11 @@
+name: Publish to NPM
+
 on:
   workflow_call:
 
 jobs:
   publish:
-    name: Publish
+    name: Publish to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Setup packages
