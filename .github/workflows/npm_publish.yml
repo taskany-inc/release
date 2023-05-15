@@ -19,8 +19,6 @@ jobs:
       - name: Setup packages
         run: npm ci
       - name: Publish to NPM
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm publish
