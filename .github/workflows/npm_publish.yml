@@ -1,5 +1,3 @@
-name: Publish to NPM
-
 on:
   workflow_call:
 
