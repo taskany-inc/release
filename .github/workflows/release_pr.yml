@@ -30,21 +30,16 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
+      - name: Auth
+      - uses: tibdex/github-app-token@v1
+        id: auth
+        with: 
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Pull Request
         id: pr
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
           gh pr create --title "Release $(cat version)" --label release -F .release_bot/body
-          echo "head_ref=releases/$(cat version)" >> "$GITHUB_OUTPUT"
-      - name: Trigger Workflow
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'release_notify.yml',
-              ref: '${{ steps.pr.outputs.head_ref }}',
-            })
           
