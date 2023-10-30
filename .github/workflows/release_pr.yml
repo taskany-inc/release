@@ -11,6 +11,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ vars.NODE_VERSION }}
+      - name: Auth
+        uses: actions/create-github-app-token@v1
+        id: auth
+        with: 
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Cache
         uses: actions/cache@v3
         with:
@@ -30,12 +36,6 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
-      - name: Auth
-        uses: tibdex/github-app-token@v2
-        id: auth
-        with: 
-          app_id: 415907
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Pull Request
         id: pr
         env:
