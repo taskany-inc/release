@@ -31,10 +31,12 @@ jobs:
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
       - name: Pull Request
+        id: pr
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr create --title "Release $(cat version)" --label release -F .release_bot/body
+          echo "head_ref=releases/$(cat version)" >> "$GITHUB_OUTPUT"
       - name: Trigger Workflow
         uses: actions/github-script@v6
         with:
@@ -43,6 +45,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'release_notify.yml',
-              ref: '${{ github.head_ref }}',
+              ref: '${{ steps.pr.outputs.head_ref }}',
             })
           
