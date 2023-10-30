@@ -11,11 +11,7 @@ jobs:
           node-version: ${{ vars.NODE_VERSION }}
       - name: Changelog
         run: |
-          git config --global user.email "sheep@taskany.org"
-          git config --global user.name "Taskany Sheep"
           npx @taskany/release@latest
-          npm version $(cat version) --git-tag-version false
-          git tag v$(cat version)
       - uses: actions/cache@v3
         with:
           path: node_modules
@@ -29,11 +25,13 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+          npm version $(cat version) --git-tag-version false
           npm publish
       - name: Push
         run: |
           git config --global user.email "sheep@taskany.org"
           git config --global user.name "Taskany Sheep"
+          git tag v$(cat version)
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin main
