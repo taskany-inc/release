@@ -35,6 +35,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr create --title "Release $(cat version)" --label release -F .release_bot/body
-          gh workflow run pr.yml --ref releases/$(cat version)
-          gh workflow run release_notify.yml --ref releases/$(cat version)
+      - name: Trigger Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release_notify.yml',
+              ref: '${{ github.head_ref }}',
+            })
           
