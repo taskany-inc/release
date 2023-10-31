@@ -9,15 +9,20 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ vars.NODE_VERSION }}
+      - name: Auth
+        uses: actions/create-github-app-token@v1
+        id: auth
+        with: 
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Release Tag
         run: |
           git config --global user.email "sheep@taskany.org"
           git config --global user.name "Taskany Sheep"
           git tag v$(cat version)
           git push --no-verify origin --tags
-
       - name: GitHub Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
           gh release create v$(cat version) --title "Release $(cat version)" -F .release_notes/$(cat version).md
