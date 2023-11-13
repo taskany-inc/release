@@ -35,7 +35,7 @@
     "semver": "7.5.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.7.1",
+    "@commitlint/cli": "18.4.1",
     "@commitlint/config-conventional": "17.7.0",
     "@typescript-eslint/eslint-plugin": "6.3.0",
     "@typescript-eslint/parser": "5.62.0",
