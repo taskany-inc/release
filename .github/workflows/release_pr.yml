@@ -32,5 +32,5 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
-          gh pr create --title "Release $(cat version)" --label release -F .release_bot/body
+          gh pr create --head $(git branch --show-current) --title "Release $(cat version)" --label release -F .release_bot/body
           
