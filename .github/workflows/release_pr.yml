@@ -17,6 +17,10 @@ jobs:
         with: 
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Set ENV variables
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
+          echo "DATE=$(date +'%d.%m.%Y')" >> $GITHUB_ENV
       - name: Changelog
         run: |
           git config --global user.email "sheep@taskany.org"
@@ -27,6 +31,60 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
+      - name: Get commits
+        id: commit_messages
+        run: |
+          git checkout releases/$(cat version)
+          commits=$(git log $(git describe --tags --abbrev=0)..HEAD --no-merges --pretty=format:%H)
+          echo "commits=${commits//$'\n'/','}" >> $GITHUB_OUTPUT
+      - name: Get JIRA tasks
+        id: jira_tasks
+        uses: actions/github-script@v7
+        env:
+          COMMIT_MESSAGES: ${{ steps.commit_messages.outputs.commits }}
+        with: 
+          script: |
+            const hashes = process.env.COMMIT_MESSAGES.split(',');
+            const tasks = [];
+
+            for (const hash of hashes) {
+              try {
+                const { data } = await github.rest.repos.getCommit({
+                  owner: `${{ github.repository_owner }}`,
+                  repo: process.env.REPO_NAME,
+                  ref: hash
+                });
+
+                const jiraIdMatch = data.commit.message.toLocaleLowerCase().match(/${{ secrets.JIRA_KEY }}-\d+/i);
+                const id = jiraIdMatch ? jiraIdMatch[0] : null;
+            
+                if (id) {
+                  tasks.push(id);
+                }
+              } catch (error) {
+                console.error(`Error fetching PR #${hash}:`, error);
+              }
+            }
+
+            return tasks;
+
+      - name: Send MM
+        uses: mattermost/action-mattermost-notify@master
+        if: ${{ vars.RELEASE_PROJECT_NAME }}
+        with:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.WEBHOOKS_RELEASE_LF_MM }}
+          TEXT: |-
+            {
+              "name": "${{ vars.RELEASE_PROJECT_NAME }}",
+              "version": "Release ${{ env.DATE }}",
+              "applicationType": "web",
+              "hotfix": false,
+              "authorMmUser": "assabotovich",
+              "configurationElement": "${{ secrets.CE }}",
+              "distributionLink": "",
+              "tasks": ${{ steps.jira_tasks.outputs.result }},
+              "jiraProject": "${{ secrets.JIRA_KEY }}"
+            }
       - name: Pull Request
         id: pr
         env:
