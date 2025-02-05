@@ -83,7 +83,7 @@ jobs:
               "configurationElement": "${{ secrets.CE }}",
               "distributionLink": "",
               "tasks": ${{ steps.jira_tasks.outputs.result }},
-              "jiraProject": "${{ secrets.JIRA_KEY }}"
+              "jiraProject": "${{ secrets.RELEASE_JIRA_KEY }}"
             }
       - name: Pull Request
         id: pr
