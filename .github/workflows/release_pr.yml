@@ -31,6 +31,13 @@ jobs:
           git add .
           git commit -n -m "chore: release $(cat version)"
           git push --no-verify origin releases/$(cat version)
+      - name: Pull Request
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          pr_url=$(gh pr create --head $(git branch --show-current) --title "Release $(cat version)" --label release -F .release_bot/body)
+          echo "pr_url=${pr_url}" >> $GITHUB_OUTPUT
       - name: Get commits
         id: commit_messages
         run: |
@@ -81,14 +88,8 @@ jobs:
               "hotfix": false,
               "authorMmUser": "assabotovich",
               "configurationElement": "${{ secrets.CE }}",
-              "distributionLink": "",
+              "distributionLink": "${{ steps.pr.outputs.pr_url }}",
               "tasks": ${{ steps.jira_tasks.outputs.result }},
               "jiraProject": "${{ secrets.RELEASE_JIRA_KEY }}"
             }
-      - name: Pull Request
-        id: pr
-        env:
-          GH_TOKEN: ${{ steps.auth.outputs.token }}
-        run: |
-          gh pr create --head $(git branch --show-current) --title "Release $(cat version)" --label release -F .release_bot/body
-          
+      
